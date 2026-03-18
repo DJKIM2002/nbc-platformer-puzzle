@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PuzzleCharacter.h"
+#include "Character/PGCharacter.h"
 
 // Sets default values
-APuzzleCharacter::APuzzleCharacter()
+APGCharacter::APGCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -12,21 +12,21 @@ APuzzleCharacter::APuzzleCharacter()
 }
 
 // Called when the game starts or when spawned
-void APuzzleCharacter::BeginPlay()
+void APGCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void APuzzleCharacter::Tick(float DeltaTime)
+void APGCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
 // Called to bind functionality to input
-void APuzzleCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 

@@ -16,41 +16,41 @@
 
 ```mermaid
 classDiagram
-    class UPuzzleGameInstance {
+    class UPGGameInstance {
         +UnlockedStageIndex : int32
         +TotalScore : int32
         +LoadProfile()
         +SaveProfile()
     }
 
-    class APuzzleGameGameMode {
+    class APGGameModeBase {
         +CheckStageClear()
         +HandleStageClear()
         +MoveToNextStage()
     }
 
-    class APuzzleGameState {
+    class APGGameStateBase {
         +ActivatedSwitchCount : int32
         +RequiredSwitchCount : int32
         +UpdatePuzzleProgress()
         +IsPuzzleSolved() bool
     }
 
-    class APuzzlePlayerState {
+    class APGPlayerState {
         +CurrentPropertyType : EObjectPropertyType
         +bHasStoredProperty : bool
         +StoreProperty()
         +ClearProperty()
     }
 
-    class APuzzlePlayerController {
+    class APGPlayerController {
         +SetupInput()
         +RequestExtract()
         +RequestInject()
         +UpdateHUD()
     }
 
-    class APuzzleCharacter {
+    class APGCharacter {
         +TryInteract()
         +TraceInteractable()
         +Move()
@@ -58,23 +58,23 @@ classDiagram
         +Jump()
     }
 
-    class UObjectPropertyActorComponent {
+    class UPGObjectPropertyComponent {
         +CurrentPropertyType : EObjectPropertyType
         +ExtractProperty() EObjectPropertyType
         +ApplyProperty(EObjectPropertyType)
         +RefreshVisualState()
     }
 
-    class APuzzleObjectActor {
+    class APGPuzzleObjectActor {
     }
 
-    UPuzzleGameInstance --> APuzzleGameGameMode : global data reference
-    APuzzleGameGameMode --> APuzzleGameState : reads stage progress
-    APuzzlePlayerController --> APuzzleCharacter : controls pawn
-    APuzzlePlayerController --> APuzzlePlayerState : reads/writes held property
-    APuzzlePlayerController --> APuzzleGameState : updates HUD source
-    APuzzleCharacter --> UObjectPropertyActorComponent : traces and interacts
-    APuzzleObjectActor *-- UObjectPropertyActorComponent : owns
+    UPGGameInstance --> APGGameModeBase : global data reference
+    APGGameModeBase --> APGGameStateBase : reads stage progress
+    APGPlayerController --> APGCharacter : controls pawn
+    APGPlayerController --> APGPlayerState : reads/writes held property
+    APGPlayerController --> APGGameStateBase : updates HUD source
+    APGCharacter --> UPGObjectPropertyComponent : traces and interacts
+    APGPuzzleObjectActor *-- UPGObjectPropertyComponent : owns
 ```
 
 ### 해석 기준
@@ -85,7 +85,7 @@ classDiagram
 - `PlayerState`: 플레이어가 보유 중인 속성 상태 담당
 - `PlayerController`: 입력 처리와 HUD 갱신 요청 담당
 - `Character`: 실제 월드 상호작용 담당
-- `ObjectPropertyActorComponent`: 퍼즐 오브젝트 속성 로직 담당
+- `PGObjectPropertyComponent`: 퍼즐 오브젝트 속성 로직 담당
 
 ---
 
@@ -95,7 +95,7 @@ classDiagram
 flowchart TD
     A[Player Input: Extract] --> B[PlayerController receives input]
     B --> C[Character line trace]
-    C --> D{Target has ObjectPropertyActorComponent?}
+    C --> D{Target has PGObjectPropertyComponent?}
     D -- No --> E[Ignore]
     D -- Yes --> F[ExtractProperty]
     F --> G[Store property in PlayerState]
@@ -103,7 +103,7 @@ flowchart TD
 
     I[Player Input: Inject] --> J[PlayerController receives input]
     J --> K[Character line trace]
-    K --> L{Target has ObjectPropertyActorComponent?}
+    K --> L{Target has PGObjectPropertyComponent?}
     L -- No --> M[Ignore]
     L -- Yes --> N{PlayerState has stored property?}
     N -- No --> O[Fail feedback]
@@ -127,13 +127,13 @@ flowchart TD
 
 ## 2. 클래스 뼈대 생성
 
-- [ ] `PuzzleGameInstance`
-- [ ] `PuzzleGameGameMode`
-- [ ] `PuzzleGameState`
-- [ ] `PuzzlePlayerState`
-- [ ] `PuzzlePlayerController`
-- [ ] `PuzzleCharacter`
-- [ ] `ObjectPropertyActorComponent`
+- [ ] `PGGameInstance`
+- [ ] `PGGameModeBase`
+- [ ] `PGGameStateBase`
+- [ ] `PGPlayerState`
+- [ ] `PGPlayerController`
+- [ ] `PGCharacter`
+- [ ] `PGObjectPropertyComponent`
 
 ## 3. 오늘 최소 구현 범위
 
@@ -141,7 +141,7 @@ flowchart TD
 - [ ] `GameMode`에 기본 클래스 연결 지점 정리
 - [ ] `PlayerController`에 Extract/Inject 입력 함수 시그니처 추가
 - [ ] `Character`에 LineTrace 상호작용 함수 시그니처 추가
-- [ ] `ObjectPropertyActorComponent`에 Extract/Apply API 시그니처 추가
+- [ ] `PGObjectPropertyComponent`에 Extract/Apply API 시그니처 추가
 
 ## 4. 이후 작업 예약
 
@@ -158,27 +158,41 @@ flowchart TD
 
 ```text
 Source/PuzzleGame
-├─ Core
-│  ├─ PuzzleGameInstance.h/.cpp
-│  ├─ PuzzleGameGameMode.h/.cpp
-│  ├─ PuzzleGameState.h/.cpp
-│  ├─ PuzzlePlayerState.h/.cpp
-│  └─ PuzzlePlayerController.h/.cpp
-├─ Character
-│  └─ PuzzleCharacter.h/.cpp
-├─ Interaction
-│  ├─ Interfaces
-│  └─ Trace
-├─ Property
-│  ├─ ObjectPropertyActorComponent.h/.cpp
-│  ├─ ObjectPropertyTypes.h
-│  └─ ObjectPropertyData.h
-├─ Puzzle
-│  ├─ Actors
-│  └─ Devices
-└─ UI
-   ├─ HUD
-   └─ Widgets
+├─ PuzzleGame.Build.cs
+├─ PuzzleGame.cpp
+├─ PuzzleGame.h
+├─ Public
+│  ├─ Core
+│  │  ├─ PGGameInstance.h
+│  │  ├─ PGGameModeBase.h
+│  │  ├─ PGGameStateBase.h
+│  │  ├─ PGPlayerState.h
+│  │  └─ PGPlayerController.h
+│  ├─ Character
+│  │  ├─ PGCharacter.h
+│  │  └─ PGTemplateCharacter.h
+│  ├─ Property
+│  │  ├─ PGObjectPropertyComponent.h
+│  │  ├─ ObjectPropertyTypes.h
+│  │  └─ ObjectPropertyData.h
+│  ├─ Interaction
+│  ├─ Puzzle
+│  └─ UI
+└─ Private
+   ├─ Core
+   │  ├─ PGGameInstance.cpp
+   │  ├─ PGGameModeBase.cpp
+   │  ├─ PGGameStateBase.cpp
+   │  ├─ PGPlayerState.cpp
+   │  └─ PGPlayerController.cpp
+   ├─ Character
+   │  ├─ PGCharacter.cpp
+   │  └─ PGTemplateCharacter.cpp
+   ├─ Property
+   │  └─ PGObjectPropertyComponent.cpp
+   ├─ Interaction
+   ├─ Puzzle
+   └─ UI
 ```
 
 ### 정리 원칙
@@ -196,7 +210,7 @@ Source/PuzzleGame
 
 1. `Property` 폴더에 속성 enum부터 정의
 2. `PlayerState`에 현재 보유 속성 저장 필드 추가
-3. `ObjectPropertyActorComponent`에 Extract/Apply 함수 시그니처 추가
+3. `PGObjectPropertyComponent`에 Extract/Apply 함수 시그니처 추가
 4. `Character`에 LineTrace 기반 대상 탐색 함수 추가
 5. `PlayerController`에 Extract/Inject 입력 라우팅 추가
 6. `GameState`, `GameMode`는 퍼즐 클리어 판정용 최소 시그니처만 먼저 추가

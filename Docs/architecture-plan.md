@@ -81,7 +81,7 @@ classDiagram
 
 - `GameInstance`: 스테이지 간 유지되는 영속 데이터 담당
 - `GameMode`: 현재 레벨 규칙과 클리어 처리 담당
-- `GameState`: 현재 레벨 진행 상황 데이터 담당
+- `GameState`: 현재 레벨 진행 상황 데이터 담당 (`GameStateBase` 기반)
 - `PlayerState`: 플레이어가 보유 중인 속성 상태 담당
 - `PlayerController`: 입력 처리와 HUD 갱신 요청 담당
 - `Character`: 실제 월드 상호작용 담당

@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameState.h"
+#include "GameFramework/GameStateBase.h"
 #include "PuzzleGameState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PUZZLEGAME_API APuzzleGameState : public AGameState
+class PUZZLEGAME_API APuzzleGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 	

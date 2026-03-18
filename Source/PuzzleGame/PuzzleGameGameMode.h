@@ -14,6 +14,3 @@ class APuzzleGameGameMode : public AGameModeBase
 public:
 	APuzzleGameGameMode();
 };
-
-
-
